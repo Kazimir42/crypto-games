@@ -1,4 +1,4 @@
-//const SlotMachine = require('../models/slotMachine');
+//const Machine = require('../models/slotMachine');
 
 exports.result = (req, res, next) => {
 
