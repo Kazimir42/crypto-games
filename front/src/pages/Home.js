@@ -3,7 +3,6 @@ import GameButton from "../components/GameButton";
 
 function Home() {
 
-
     return (
         <div className="container mx-auto mt-auto mb-auto">
             <h1 className="text-center text-7xl text-white font-bold">
