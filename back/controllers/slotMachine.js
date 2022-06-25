@@ -20,5 +20,6 @@ exports.result = (req, res, next) => {
         result: resultArray,
         wining: winning
     }
+
     res.status(200).json(result);
 };
