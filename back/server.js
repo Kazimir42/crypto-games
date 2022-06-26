@@ -4,6 +4,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 
 const slotMachineRoutes = require('./routes/slotMachine')
+const addressRoutes = require('./routes/address')
 
 const app = express();
 
@@ -23,6 +24,7 @@ app.use((req, res, next) => {
 
 app.use(express.json());
 
-app.use('/slot-machine', slotMachineRoutes)
+app.use('/slot-machines', slotMachineRoutes)
+app.use('/addresses', addressRoutes)
 
 app.listen(3001, () => console.log('Example app is listening on port 3001.'));

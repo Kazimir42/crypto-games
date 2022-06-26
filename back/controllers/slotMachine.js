@@ -1,9 +1,4 @@
 const SlotMachine = require('../models/SlotMachine');
-const {now} = require("mongoose");
-
-exports.result = (req, res, next) => {
-
-};
 
 exports.store = (req, res, next) => {
 

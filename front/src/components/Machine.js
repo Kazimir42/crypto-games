@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 
 function Machine() {
 
@@ -10,13 +10,25 @@ function Machine() {
     const [address, setAddress] = useState('0xC5eE86ddC2A8aA2a8578A1c6d5EAe43c95eb09d5')
     const [bet, setBet] = useState(0.1)
     const [earnings, setEarnings] = useState(0)
+    const [balance, setBalance] = useState(0)
+
+    useEffect(() => {
+        //GET address with total balance in DB
+
+        fetch('http://localhost:3001/addresses/' + address)
+            .then(response => response.json())
+            .then(data => {
+                setBalance(data.balance)
+            });
+
+    });
 
     function run() {
         if (!drawing) {
             setDrawing(true);
             setEarnings(0)
 
-            fetch('http://localhost:3001/slot-machine/store', {
+            fetch('http://localhost:3001/slot-machines/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
