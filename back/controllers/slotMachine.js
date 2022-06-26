@@ -1,25 +1,40 @@
-//const Machine = require('../models/slotMachine');
+const SlotMachine = require('../models/SlotMachine');
+const {now} = require("mongoose");
 
 exports.result = (req, res, next) => {
 
-    let array = [1, 2, 3];
+};
+
+exports.store = (req, res, next) => {
+
+    let address = req.body.address;
+    let bet = req.body.bet;
+    let earnings = 0;
+
     let resultArray = [];
 
-
-    for (let i = 0; i < array.length; i++ )
-    {
+    for (let i = 0; i < 3; i++ ) {
         let rand = Math.random();
-        rand *= array.length;
+        rand *= 3;
         rand = Math.floor(rand) + 1;
         resultArray.push(rand);
     }
+    let wining = resultArray.every( (val, i, arr) => val === arr[0] )
 
-    let winning = resultArray.every( (val, i, arr) => val === arr[0] )
-
-    let result = {
-        result: resultArray,
-        wining: winning
+    if (wining) {
+        earnings = bet * 3;
     }
 
-    res.status(200).json(result);
+    const slotMachine = new SlotMachine({
+        address: address,
+        played_at: Date.now(),
+        result: resultArray,
+        wining: wining,
+        bet: bet,
+        earnings: earnings.toFixed(2)
+    });
+    slotMachine.save() //save in mongodb
+        .then(() => res.status(201).json( slotMachine ))
+        .catch(error => res.status(400).json({ error }))
+
 };

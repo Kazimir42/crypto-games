@@ -1,43 +1,63 @@
 import {useState} from "react";
 
-function Machine () {
+function Machine() {
 
     const [firstNumber, setFirstNumber] = useState(3)
     const [secondNumber, setSecondNumber] = useState(3)
     const [thirdNumber, setThirdNumber] = useState(3)
     const [wining, setWining] = useState(false)
+    const [drawing, setDrawing] = useState(false)
+    const [address, setAddress] = useState('0xC5eE86ddC2A8aA2a8578A1c6d5EAe43c95eb09d5')
+    const [bet, setBet] = useState(0.1)
+    const [earnings, setEarnings] = useState(0)
 
     function run() {
-        fetch('http://localhost:3001/slot-machine/result')
-            .then(response => response.json())
-            .then(data => {
+        if (!drawing) {
+            setDrawing(true);
+            setEarnings(0)
 
-                console.log(data);
+            fetch('http://localhost:3001/slot-machine/store', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    address: address,
+                    bet: bet,
+                }),
+            })
+                .then(response => response.json())
+                .then(data => {
 
-                let interval = setInterval(() => {
-                    setFirstNumber(randomNumber)
-                    setSecondNumber(randomNumber)
-                    setThirdNumber(randomNumber)
-                }, 150);
+                    console.log(data);
 
-                setTimeout(() => {
-                    stop(interval);
-                    setFirstNumber(data.result[0])
-                    setSecondNumber(data.result[1])
-                    setThirdNumber(data.result[2])
+                    let interval = setInterval(() => {
+                        setFirstNumber(randomNumber)
+                        setSecondNumber(randomNumber)
+                        setThirdNumber(randomNumber)
+                    }, 150);
 
-                    if (data.wining)
-                    {
-                        setWining(true);
-                        let audio = new Audio(process.env.PUBLIC_URL + '/sounds/wining-sound.mp3');
-                        audio.play();
-                    }else
-                    {
-                        setWining(false);
-                    }
-                }, 5000);
+                    setTimeout(() => {
+                        stop(interval);
+                        setFirstNumber(data.result[0])
+                        setSecondNumber(data.result[1])
+                        setThirdNumber(data.result[2])
+                        setEarnings(data.earnings)
 
-            });
+                        if (data.wining) {
+                            setWining(true);
+                            let audio = new Audio(process.env.PUBLIC_URL + '/sounds/wining-sound.mp3');
+                            audio.play();
+                        } else {
+                            setWining(false);
+                        }
+
+                        setDrawing(false);
+                    }, 1000);
+
+                });
+        }
+
     }
 
     function randomNumber() {
@@ -55,10 +75,14 @@ function Machine () {
     function WiningModal() {
         return (
             <div className="bg-opacity-30 bg-stone-900 absolute top-0 left-0 w-full h-full flex flex-col">
-                <div className="bg-gray-800 text-white backdrop-blur-3xl inline-block mt-auto mb-auto mx-auto shadow-2xl rounded h-56 w-96 flex flex-col gap-2 p-4">
+                <div
+                    className="bg-gray-800 text-white backdrop-blur-3xl inline-block mt-auto mb-auto mx-auto shadow-2xl rounded h-56 w-96 flex flex-col gap-2 p-4">
                     <p className="text-center text-3xl font-bold">You win</p>
-                    <p className="text-center text-lg mt-auto mb-auto">+ 0.9 ETH</p>
-                    <button className="bg-gray-200 text-2xl text-gray-900 text-center py-2 mt-auto px-4 font-semibold hover: shadow-lg rounded duration-200" onClick={x => setWining(false)}>Ok</button>
+                    <p className="text-center text-lg mt-auto mb-auto">+ {earnings} ETH</p>
+                    <button
+                        className="bg-gray-200 text-2xl text-gray-900 text-center py-2 mt-auto px-4 font-semibold hover: shadow-lg rounded duration-200"
+                        onClick={x => setWining(false)}>Ok
+                    </button>
                 </div>
             </div>
         )
@@ -69,7 +93,7 @@ function Machine () {
         <div>
 
             {
-                wining ? <WiningModal /> : ''
+                wining ? <WiningModal/> : ''
             }
 
             <div>
@@ -93,8 +117,13 @@ function Machine () {
                 </div>
             </div>
             <div className="text-center mt-8">
-                <button className="bg-gray-200 text-2xl text-center py-2 px-4 font-semibold hover:scale-105 shadow-lg rounded duration-200" onClick={run}>Relancer</button>
+                <button
+                    className="bg-gray-200 text-2xl text-center py-2 px-4 font-semibold hover:scale-105 shadow-lg rounded duration-200"
+                    onClick={run}>Relancer
+                </button>
             </div>
         </div>
     )
-}export default Machine;
+}
+
+export default Machine;
