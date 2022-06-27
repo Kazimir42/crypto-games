@@ -1,4 +1,7 @@
 const SlotMachine = require('../models/SlotMachine');
+const SlotMachineService = require('../services/slotMachineService');
+
+const slotMachineService = new SlotMachineService()
 
 exports.store = (req, res, next) => {
 
@@ -6,15 +9,8 @@ exports.store = (req, res, next) => {
     let bet = req.body.bet;
     let earnings = 0;
 
-    let resultArray = [];
-
-    for (let i = 0; i < 3; i++ ) {
-        let rand = Math.random();
-        rand *= 3;
-        rand = Math.floor(rand) + 1;
-        resultArray.push(rand);
-    }
-    let wining = resultArray.every( (val, i, arr) => val === arr[0] )
+    let result = slotMachineService.runMachine();
+    let wining = slotMachineService.isWining(result)
 
     if (wining) {
         earnings = bet * 3;
@@ -23,7 +19,7 @@ exports.store = (req, res, next) => {
     const slotMachine = new SlotMachine({
         address: address,
         played_at: Date.now(),
-        result: resultArray,
+        result: result,
         wining: wining,
         bet: bet,
         earnings: earnings.toFixed(2)
